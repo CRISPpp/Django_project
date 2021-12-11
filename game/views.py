@@ -8,5 +8,5 @@ def index(request):
 
 def play(request):
     line1 = '<h1 style="text-align: center">PLAY界面</h1>'
-    line2 = '<a href="/index/">MENU界面</a>'
+    line2 = '<a href="/">MENU界面</a>'
     return HttpResponse(line1 + line2)
