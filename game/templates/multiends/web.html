@@ -6,8 +6,26 @@
     <link rel="stylesheet" href="{% static 'css/game.css' %}">
 </head>
 
+
 <body style="margin: 0">
     <div id="crisp_1"></div>
+    <audio id="bgMusic" loop>
+        <source src={% static 'audio/鸡你太美无限循环.mp3' %} type="audio/mpeg">
+    </audio>
+    <button id= "button1" onclick="play()"></button>
+    <script>
+        function play(){
+            let bgSound = document.getElementById("bgMusic");
+            if(bgSound.paused){
+            bgSound.play();    
+            }
+            else{
+                bgSound.pause(); 
+            }
+        }
+        
+    </script>
+    
     <script type="module">
         import {AcGame} from "{% static 'js/dist/game.js' %}";
         $(document).ready(function(){
