@@ -9,4 +9,5 @@ static:   管理静态文件
 consumers:管理websocket
 
 目前的测试网站：https://app922.acapp.acwing.com.cn/
+因为域名备案时间太久，所以我直接用y总提供的域名
 
