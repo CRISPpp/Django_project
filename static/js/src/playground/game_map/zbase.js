@@ -1,6 +1,5 @@
 class GameMap extends AcGameObject{
     constructor(playground){
-        console.log("game_map");
         super();
         this.playground = playground;
         this.$canvas = $(`<canvas></canvas>`);//js提供的画布渲染工具

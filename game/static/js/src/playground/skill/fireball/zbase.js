@@ -21,7 +21,6 @@ class FireBall extends AcGameObject{
     }
 
     update(){
-        console.log(this.move_length);
         if(this.move_length < this.eps){
             this.destroy();
             return false;

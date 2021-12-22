@@ -20,6 +20,10 @@ class Player extends AcGameObject {
         this.spend_time = 0;//保护时间不然太容易死了233333
         this.cur_skill = null;//当前选的技能
 
+        if(this.is_me){
+            this.img = new Image();
+            this.img.src = this.playground.root.settings.photo;
+        }
     }
 
     start(){
@@ -71,7 +75,6 @@ class Player extends AcGameObject {
     }
 
     shoot_fireball(tx, ty){
-        console.log("shoot");
         let x = this.x, y = this.y;
         let radius = this.playground.height * 0.01;
         let angle = Math.atan2(ty - this.y, tx - this.x);
@@ -79,8 +82,8 @@ class Player extends AcGameObject {
         let color = "orange";
         let speed = this.playground.height * 0.5;
         let move_length = this.playground.height ;
-        //new FireBall(this.playground, this, x, y, radius, vx, vy, color,speed, move_length,this.playground.height*0.01);
-        new FireBall(this.playground, this, x, y, radius, vx, vy, color,speed, move_length,0);
+        new FireBall(this.playground, this, x, y, radius, vx, vy, color,speed, move_length,this.playground.height*0.01);
+        //new FireBall(this.playground, this, x, y, radius, vx, vy, color,speed, move_length,0);
     }
 
     get_dist(x1, y1, x2, y2){
@@ -119,7 +122,7 @@ class Player extends AcGameObject {
         this.damage_x = Math.cos(angle);
         this.damage_y = Math.sin(angle);
         this.damage_speed = damage * 100;
-        //this.speed *= 0.8;
+        this.speed *= 0.8;
     }
 
     update(){
@@ -161,10 +164,21 @@ class Player extends AcGameObject {
     }
 
     render(){
-        this.ctx.beginPath();
-        this.ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-        this.ctx.fillStyle = this.color;
-        this.ctx.fill();
+        if(this.is_me){
+            this.ctx.save();
+            this.ctx.beginPath();
+            this.ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+            this.ctx.stroke();
+            this.ctx.clip();
+            this.ctx.drawImage(this.img, this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2);
+            this.ctx.restore();
+        }
+        else{
+            this.ctx.beginPath();
+            this.ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+            this.ctx.fillStyle = this.color;
+            this.ctx.fill();
+        }
     }
 
     on_destroy(){
