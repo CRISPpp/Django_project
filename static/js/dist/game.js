@@ -617,7 +617,7 @@ class Settings{
         this.$register_error_messages.empty();
 
         $.ajax({
-            url:"https://app922.acapp.acwing.com.cn/settings/register/",
+            url:"https://www.crisp.plus/settings/register/",
             type:"GET",
             data:{
                 username:username,
@@ -646,7 +646,7 @@ class Settings{
         this.$login_error_messages.empty();
 
         $.ajax({
-            url: "https://app922.acapp.acwing.com.cn/settings/login/",
+            url: "https://www.crisp.plus/settings/login/",
             type: "GET",
             data:{
                 username:username,
@@ -665,7 +665,7 @@ class Settings{
     logout_on_remote(){//远程登出
         if(this.platform === "ACAPP") return false;
         $.ajax({
-            url:"https://app922.acapp.acwing.com.cn/settings/logout/",
+            url:"https://www.crisp.plus/settings/logout/",
             type: "GET",
             success: function(resp){
                 if(resp.result === "success"){
@@ -679,7 +679,7 @@ class Settings{
     getinfo(){
         let outer = this;
         $.ajax({
-            url: "https://app922.acapp.acwing.com.cn/settings/getinfo/",
+            url: "https://www.crisp.plus/settings/getinfo/",
             type:"GET",
             data:{
                 platform: outer.platform,
