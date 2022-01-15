@@ -34,7 +34,7 @@ class Settings{
                 </div>
                 <br>
                 <div class="ac_game_settings_acwing">
-                    <img width="30" src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20190918%2Fec49ee72072c4782a61eae7444feede4.png&refer=http%3A%2F%2F5b0988e595225.cdn.sohucs.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1642737692&t=2785700352af6b606e9cfeb6cf6da517">
+                    <img width="30" src="https://cdn.acwing.com/media/article/image/2021/11/18/1_ea3d5e7448-logo64x64_2.png">
                     
                     <br>
                     <br>
@@ -75,7 +75,7 @@ class Settings{
                 </div>
                 <br>
                 <div class="ac_game_settings_acwing">
-                    <img width="30" src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20190918%2Fec49ee72072c4782a61eae7444feede4.png&refer=http%3A%2F%2F5b0988e595225.cdn.sohucs.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1642737692&t=2785700352af6b606e9cfeb6cf6da517">
+                    <img width="30" src="https://cdn.acwing.com/media/article/image/2021/11/18/1_ea3d5e7448-logo64x64_2.png">
                     
                     <br>
                     <br>
@@ -101,6 +101,9 @@ class Settings{
         this.$register_error_messages = this.$register.find(".ac_game_settings_error_messages");
         this.$register_login = this.$register.find(".ac_game_settings_option");
         this.$register.hide();
+
+        this.$acwing_login = this.$settings.find('.ac_game_settings_acwing img')
+
         this.root.$ac_game.append(this.$settings);
         this.start();
     }
@@ -111,9 +114,27 @@ class Settings{
     }
 
     add_listening_events(){
+        let outer = this;
         this.add_listening_events_login();
         this.add_listening_events_register();
+
+        this.$acwing_login.click(function(){
+            outer.acwing_login();
+        });
     }
+
+    acwing_login(){
+        $.ajax({
+            url:"https://www.crisp.plus/settings/crispplus/web/apply_code/",
+            type: "GET",
+            success: function(resp){
+                if(resp.result === "success"){
+                    window.location.replace(resp.apply_code_url);
+                }
+            }
+        });
+    }
+
     add_listening_events_login(){
         let outer = this;
         this.$login_register.click(function(){

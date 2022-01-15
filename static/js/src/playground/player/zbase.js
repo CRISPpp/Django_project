@@ -46,12 +46,12 @@ class Player extends AcGameObject {
             if(e.which === 3){
                 outer.move_to(e.clientX - rect.left, e.clientY - rect.top);
                 let flag = true;
-                document.getElementById('button1').click();
+                //document.getElementById('button1').click();
                 flag=false;
             }
             else if(e.which === 1){
                  let flag = true;
-                 document.getElementById('button1').click();
+                 //document.getElementById('button1').click();
                  flag=false;
                 if(outer.cur_skill === "fireball"){
                     outer.shoot_fireball(e.clientX - rect.left, e.clientY - rect.top);

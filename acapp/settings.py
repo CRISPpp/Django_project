@@ -27,7 +27,16 @@ SECRET_KEY = 'django-insecure-%x1oej#@w5n*uo%)viea!il*d^5e$gz#lzzad!puk3795mdc#j
 DEBUG = True
 
 ALLOWED_HOSTS = ["101.35.146.231", "www.crisp.plus","www.crisp.plus"]
-
+CACHES = { 
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/1',
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },  
+    },  
+}
+USER_AGENTS_CACHE = 'default'
 
 # Application definition
 
