@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-%x1oej#@w5n*uo%)viea!il*d^5e$gz#lzzad!puk3795mdc#j
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["101.35.146.231", "www.crisp.plus","www.crisp.plus"]
+ALLOWED_HOSTS = ["101.35.146.231", "www.crisp.plus","www.crisp.plus","app922.acapp.acwing.com.cn"]
 CACHES = { 
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
