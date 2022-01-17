@@ -474,10 +474,9 @@ class Settings{
     constructor(root){
         this.root = root;
         this.platform = "WEB";
-        if(this.root.AcWingOs) this.platform = "ACAPP";
+        if(this.root.AcWingOS) this.platform = "ACAPP";
         this.username = "";
         this.photo = "";
-
         this.$settings = $(`
         <div class="ac_game_settings">
             <div class="ac_game_settings_login">
@@ -581,8 +580,14 @@ class Settings{
     }
 
     start(){
-        this.getinfo();
+        console.log(this.platform);
+        if(this.platform === "ACAPP"){
+            this.getinfo_acapp();
+        }
+        else{
+        this.getinfo_web();
         this.add_listening_events();
+        }
     }
 
     add_listening_events(){
@@ -696,8 +701,34 @@ class Settings{
         });
     }
 
+    acapp_login(appid, redirect_uri, scope, state){
+        let outer = this;
+        this.root.AcWingOS.api.oauth2.authorize(appid, redirect_uri, scope, state, function(resp){
+            if(resp.result === "success"){
+                outer.username = resp.username;
+                outer.photo = resp.photo;
+                outer.hide();
+                outer.root.menu.show();
+            }
+        });
+    }
+
     //从服务端获取信息
-    getinfo(){
+
+    getinfo_acapp(){
+        let outer = this;
+        $.ajax({
+            url:"https://www.crisp.plus/settings/crispplus/acapp/apply_code/",
+            type:"GET",
+            success: function(resp){
+                if(resp.result === "success"){
+                    outer.acapp_login(resp.appid, resp.redirect_uri, resp.scope, resp.state);
+                }
+            }
+        });
+    }
+
+    getinfo_web(){
         let outer = this;
         $.ajax({
             url: "https://www.crisp.plus/settings/getinfo/",
