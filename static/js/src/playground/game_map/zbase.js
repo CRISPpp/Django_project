@@ -14,6 +14,12 @@ class GameMap extends AcGameObject{
 
     }
 
+    resize(){
+        this.ctx.canvas.width = this.playground.width;
+        this.ctx.canvas.height = this.playground.height;
+        this.ctx.fillStyle = "rgba(255,192,203,1)";//下面两行能去除变化窗口的渐变效果
+        this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+    }
 
     update(){
         this.render();
