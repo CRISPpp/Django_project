@@ -1,10 +1,12 @@
 class Player extends AcGameObject {
-    constructor(playground, x, y, radius, color, speed, is_me){
+    constructor(playground, x, y, radius, color, speed, character, username, photo){
         super();
         this.playground = playground;
         this.ctx = this.playground.game_map.ctx;
         this.x = x;
         this.y = y;
+        this.username = username;
+        this.photo = photo;
         this.damage_x = 0;
         this.damage_y = 0;
         this.damage_speed = 0;
@@ -14,20 +16,20 @@ class Player extends AcGameObject {
         this.radius = radius;
         this.color = color;
         this.speed = speed;
-        this.is_me = is_me;
+        this.character = character;
         this.eps = 0.01; //浮点运算，小于多少就算0
         this.friction = 0.9;//类似摩擦力递降的值
         this.spend_time = 0;//保护时间不然太容易死了233333
         this.cur_skill = null;//当前选的技能
 
-        if(this.is_me){
+        if(this.character !== "robot"){
             this.img = new Image();
-            this.img.src = this.playground.root.settings.photo;
+            this.img.src = this.photo;
         }
     }
 
     start(){
-        if(this.is_me){
+        if(this.character === "me"){
             this.add_listening_events();
         }else{
             let tx = Math.random() * this.playground.width/this.playground.scale;
@@ -134,7 +136,7 @@ class Player extends AcGameObject {
         //负责更新玩家移动
         this.spend_time += this.timedelta / 1000;
         
-        if(!this.is_me &&  this.spend_time > 4 &&  Math.random() < 1 / 300.0){
+        if(this.character === "robot" &&  this.spend_time > 4 &&  Math.random() < 1 / 300.0){
             let player = this.playground.players[Math.floor(Math.random()*this.playground.players.length)];
             let tx = player.x + player.speed * this.vx * this.timedelta / 1000 * 0.5;
             let ty = player.y + player.speed * this.vy * this.timedelta / 1000 * 0.5;
@@ -153,7 +155,7 @@ class Player extends AcGameObject {
             this.move_length = 0;
             this.vx = this.vy = 0;
             //AI的话
-            if(!this.is_me){
+            if(this.character === "robot"){
                 let tx = Math.random() * this.playground.width/this.playground.scale;
                 let ty = Math.random() * this.playground.height/this.playground.scale;
                 this.move_to(tx, ty);
@@ -170,7 +172,7 @@ class Player extends AcGameObject {
 
     render(){
         let scale = this.playground.scale;
-        if(this.is_me){
+        if(this.character !== "robot"){
             this.ctx.save();
             this.ctx.beginPath();
             this.ctx.arc(this.x * scale, this.y * scale, this.radius * scale, 0, Math.PI * 2, false);

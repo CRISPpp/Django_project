@@ -33,8 +33,8 @@ class Settings{
                 </div>
                 <br>
                 <div class="ac_game_settings_acwing">
-                    <img width="30" src="https://cdn.acwing.com/media/article/image/2021/11/18/1_ea3d5e7448-logo64x64_2.png">
-                    
+                    <img width="30" src="https://cdn.acwing.com/media/article/image/2021/11/18/1_ea3d5e7448-logo64x64_2.png" class="acwing_login">
+                    <img width="30" src="https://www.crisp.plus/static/image/settings/qqlogo.png" class="qq_login"> 
                     <br>
                     <br>
                     <div>
@@ -74,8 +74,8 @@ class Settings{
                 </div>
                 <br>
                 <div class="ac_game_settings_acwing">
-                    <img width="30" src="https://cdn.acwing.com/media/article/image/2021/11/18/1_ea3d5e7448-logo64x64_2.png">
-                    
+                    <img width="30" src="https://cdn.acwing.com/media/article/image/2021/11/18/1_ea3d5e7448-logo64x64_2.png" class="acwing_login">
+                    <img width="30" src="https://www.crisp.plus/static/image/settings/qqlogo.png" class="qq_login"> 
                     <br>
                     <br>
                     <div>
@@ -101,7 +101,9 @@ class Settings{
         this.$register_login = this.$register.find(".ac_game_settings_option");
         this.$register.hide();
 
-        this.$acwing_login = this.$settings.find('.ac_game_settings_acwing img')
+        this.$acwing_login = this.$settings.find('.acwing_login')
+        this.$qq_login = this.$settings.find('.qq_login')
+        
 
         this.root.$ac_game.append(this.$settings);
         this.start();
@@ -125,6 +127,21 @@ class Settings{
 
         this.$acwing_login.click(function(){
             outer.acwing_login();
+        });
+        this.$qq_login.click(function(){
+            outer.qq_login();
+        });
+    }
+
+    qq_login(){
+        $.ajax({
+            url:"https://www.crisp.plus/settings/crispplus/qq/apply_code/",
+            type:"GET",
+            success: function(resp){
+                if(resp.result === "success"){
+                    window.location.replace(resp.apply_code_url);
+                }
+            }
         });
     }
 

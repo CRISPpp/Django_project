@@ -35,10 +35,11 @@ class AcGameMenu {
         let outer = this;
         this.$single_mode.click(function(){
             outer.hide();
-            outer.root.playground.show();
+            outer.root.playground.show("single mode");
         });
         this.$multi_mode.click(function(){
-            console.log("click multi mode");
+            outer.hide();
+            outer.root.playground.show("multi mode");
         });
         this.$settings.click(function(){
             outer.root.settings.logout_on_remote();
@@ -185,12 +186,14 @@ class Particle extends AcGameObject{
         this.ctx.fill();
     }
 }class Player extends AcGameObject {
-    constructor(playground, x, y, radius, color, speed, is_me){
+    constructor(playground, x, y, radius, color, speed, character, username, photo){
         super();
         this.playground = playground;
         this.ctx = this.playground.game_map.ctx;
         this.x = x;
         this.y = y;
+        this.username = username;
+        this.photo = photo;
         this.damage_x = 0;
         this.damage_y = 0;
         this.damage_speed = 0;
@@ -200,20 +203,20 @@ class Particle extends AcGameObject{
         this.radius = radius;
         this.color = color;
         this.speed = speed;
-        this.is_me = is_me;
+        this.character = character;
         this.eps = 0.01; //浮点运算，小于多少就算0
         this.friction = 0.9;//类似摩擦力递降的值
         this.spend_time = 0;//保护时间不然太容易死了233333
         this.cur_skill = null;//当前选的技能
 
-        if(this.is_me){
+        if(this.character !== "robot"){
             this.img = new Image();
-            this.img.src = this.playground.root.settings.photo;
+            this.img.src = this.photo;
         }
     }
 
     start(){
-        if(this.is_me){
+        if(this.character === "me"){
             this.add_listening_events();
         }else{
             let tx = Math.random() * this.playground.width/this.playground.scale;
@@ -320,7 +323,7 @@ class Particle extends AcGameObject{
         //负责更新玩家移动
         this.spend_time += this.timedelta / 1000;
         
-        if(!this.is_me &&  this.spend_time > 4 &&  Math.random() < 1 / 300.0){
+        if(this.character === "robot" &&  this.spend_time > 4 &&  Math.random() < 1 / 300.0){
             let player = this.playground.players[Math.floor(Math.random()*this.playground.players.length)];
             let tx = player.x + player.speed * this.vx * this.timedelta / 1000 * 0.5;
             let ty = player.y + player.speed * this.vy * this.timedelta / 1000 * 0.5;
@@ -339,7 +342,7 @@ class Particle extends AcGameObject{
             this.move_length = 0;
             this.vx = this.vy = 0;
             //AI的话
-            if(!this.is_me){
+            if(this.character === "robot"){
                 let tx = Math.random() * this.playground.width/this.playground.scale;
                 let ty = Math.random() * this.playground.height/this.playground.scale;
                 this.move_to(tx, ty);
@@ -356,7 +359,7 @@ class Particle extends AcGameObject{
 
     render(){
         let scale = this.playground.scale;
-        if(this.is_me){
+        if(this.character !== "robot"){
             this.ctx.save();
             this.ctx.beginPath();
             this.ctx.arc(this.x * scale, this.y * scale, this.radius * scale, 0, Math.PI * 2, false);
@@ -483,18 +486,25 @@ class FireBall extends AcGameObject{
         if(this.game_map) this.game_map.resize();
     }
 
-    show(){
+    show(mode){
+
         this.$playground.show();
-        this.resize();
+        
         this.width = this.$playground.width();
         this.height = this.$playground.height();
         this.game_map = new GameMap(this);
+        this.resize();
         this.players = [];
         
-        this.players.push(new Player(this, this.width/2/this.scale, 0.5, 0.05, "black", 0.15, true));
+        this.players.push(new Player(this, this.width/2/this.scale, 0.5, 0.05, "black", 0.15, "me", this.root.settings.username, this.root.settings.photo));
 
-        for(let i = 0; i < 5; i++){
-            this.players.push(new Player(this, this.width/2/this.scale, 0.5, 0.05, this.get_random_color(), 0.15, false));
+        if(mode === "single mode"){//单人模式加机器人
+            for(let i = 0; i < 5; i++){
+                this.players.push(new Player(this, this.width/2/this.scale, 0.5, 0.05, this.get_random_color(), 0.15, "robot"));
+            }
+        }
+        else if(mode === "multi mode"){
+
         }
     }
 
@@ -537,8 +547,8 @@ class Settings{
                 </div>
                 <br>
                 <div class="ac_game_settings_acwing">
-                    <img width="30" src="https://cdn.acwing.com/media/article/image/2021/11/18/1_ea3d5e7448-logo64x64_2.png">
-                    
+                    <img width="30" src="https://cdn.acwing.com/media/article/image/2021/11/18/1_ea3d5e7448-logo64x64_2.png" class="acwing_login">
+                    <img width="30" src="https://www.crisp.plus/static/image/settings/qqlogo.png" class="qq_login"> 
                     <br>
                     <br>
                     <div>
@@ -578,8 +588,8 @@ class Settings{
                 </div>
                 <br>
                 <div class="ac_game_settings_acwing">
-                    <img width="30" src="https://cdn.acwing.com/media/article/image/2021/11/18/1_ea3d5e7448-logo64x64_2.png">
-                    
+                    <img width="30" src="https://cdn.acwing.com/media/article/image/2021/11/18/1_ea3d5e7448-logo64x64_2.png" class="acwing_login">
+                    <img width="30" src="https://www.crisp.plus/static/image/settings/qqlogo.png" class="qq_login"> 
                     <br>
                     <br>
                     <div>
@@ -605,7 +615,9 @@ class Settings{
         this.$register_login = this.$register.find(".ac_game_settings_option");
         this.$register.hide();
 
-        this.$acwing_login = this.$settings.find('.ac_game_settings_acwing img')
+        this.$acwing_login = this.$settings.find('.acwing_login')
+        this.$qq_login = this.$settings.find('.qq_login')
+        
 
         this.root.$ac_game.append(this.$settings);
         this.start();
@@ -629,6 +641,21 @@ class Settings{
 
         this.$acwing_login.click(function(){
             outer.acwing_login();
+        });
+        this.$qq_login.click(function(){
+            outer.qq_login();
+        });
+    }
+
+    qq_login(){
+        $.ajax({
+            url:"https://www.crisp.plus/settings/crispplus/qq/apply_code/",
+            type:"GET",
+            success: function(resp){
+                if(resp.result === "success"){
+                    window.location.replace(resp.apply_code_url);
+                }
+            }
         });
     }
 
