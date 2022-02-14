@@ -61,6 +61,16 @@ class AcGameObject{
         AC_GAME_OBJECTS.push(this);
         this.has_called_start = false;//标记start有没有被执行
         this.timedelta = 0;//距离上一帧的时间ms， 有的浏览器调用requestAnimationFrame没有一秒60次
+        this.uuid = this.create_uuid();
+    }
+
+    create_uuid(){
+        let res = "";
+        for(let i = 0; i < 8; i++){
+            let x = parseInt(Math.floor(Math.random() * 10));//parseInt(string, radix)将字符串转成int
+            res += x;
+        }
+        return res;
     }
 
     start(){// 第一帧
@@ -454,6 +464,55 @@ class FireBall extends AcGameObject{
         this.ctx.fillStyle = this.color;
         this.ctx.fill();
     }
+}class MultiPlayerSocket{
+    constructor(playground){
+        this.playground = playground;
+
+        this.ws = new WebSocket("wss://www.crisp.plus/wss/multiplayer/");
+
+        this.start();
+    }
+    start(){
+        this.receive();//从前端接受信息
+    }
+
+    receive(){
+        let outer = this;
+        this.ws.onmessage = function(e){
+            let data = JSON.parse(e.data);
+
+            if(data.uuid === outer.uuid) return false;
+            let event = data.event;
+            if(event === "create_player"){
+                outer.receive_create_player(data.uuid, data.username, data.photo);
+            }
+        };
+    }
+
+    send_create_player(username, photo) {
+        let outer = this;
+        this.ws.send(JSON.stringify({
+            'event': "create_player",
+            'uuid': outer.uuid,
+            'username': username,
+            'photo': photo,
+        }));   
+    }
+    receive_create_player(uuid, username, photo){
+        let player = new Player(
+            this.playground,
+            this.playground.width / 2 / this.playground.scale,
+            0.5,
+            0.05,
+            "white",
+            0.15,
+            "enemy",
+            username,
+            photo,
+        );
+        player.uuid = uuid;
+        this.playground.players.push(player);
+    }
 }class AcGamePlayground{
     constructor(root) {
         this.root = root;
@@ -487,7 +546,7 @@ class FireBall extends AcGameObject{
     }
 
     show(mode){
-
+        let outer = this;
         this.$playground.show();
         
         this.width = this.$playground.width();
@@ -504,7 +563,11 @@ class FireBall extends AcGameObject{
             }
         }
         else if(mode === "multi mode"){
-
+            this.mps = new MultiPlayerSocket(this);
+            this.mps.uuid = this.players[0].uuid; 
+            this.mps.ws.onopen = function(){
+                outer.mps.send_create_player(outer.root.settings.username, outer.root.settings.photo);
+            };
         }
     }
 

@@ -4,6 +4,16 @@ class AcGameObject{
         AC_GAME_OBJECTS.push(this);
         this.has_called_start = false;//标记start有没有被执行
         this.timedelta = 0;//距离上一帧的时间ms， 有的浏览器调用requestAnimationFrame没有一秒60次
+        this.uuid = this.create_uuid();
+    }
+
+    create_uuid(){
+        let res = "";
+        for(let i = 0; i < 8; i++){
+            let x = parseInt(Math.floor(Math.random() * 10));//parseInt(string, radix)将字符串转成int
+            res += x;
+        }
+        return res;
     }
 
     start(){// 第一帧

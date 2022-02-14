@@ -31,7 +31,7 @@ class Player extends AcGameObject {
     start(){
         if(this.character === "me"){
             this.add_listening_events();
-        }else{
+        }else if(this.character === "robor"){
             let tx = Math.random() * this.playground.width/this.playground.scale;
             let ty = Math.random() * this.playground.height/this.playground.scale;
             this.move_to(tx, ty);
