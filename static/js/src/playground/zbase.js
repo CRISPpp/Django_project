@@ -39,7 +39,7 @@ class AcGamePlayground{
         this.game_map = new GameMap(this);
         this.resize();
         this.players = [];
-        
+        this.mode = mode; 
         this.players.push(new Player(this, this.width/2/this.scale, 0.5, 0.05, "black", 0.15, "me", this.root.settings.username, this.root.settings.photo));
 
         if(mode === "single mode"){//单人模式加机器人

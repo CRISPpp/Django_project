@@ -46,7 +46,12 @@ class Player extends AcGameObject {
             //rect 是画布相对屏幕的量，left是（0,0）到左边界的距离，top是到上边界的距离
             const rect = outer.ctx.canvas.getBoundingClientRect();
             if(e.which === 3){
-                outer.move_to((e.clientX - rect.left)/outer.playground.scale, (e.clientY - rect.top)/outer.playground.scale);
+                let tx = (e.clientX - rect.left)/outer.playground.scale ;
+                let ty = (e.clientY - rect.top)/outer.playground.scale;
+                outer.move_to(tx, ty);
+                if(outer.playground.mode === "multi mode"){
+                    outer.playground.mps.send_move_to(tx, ty);
+                }
                 let flag = true;
                 //document.getElementById('button1').click();
                 flag=false;

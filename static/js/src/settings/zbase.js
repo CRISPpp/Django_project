@@ -234,7 +234,10 @@ class Settings{
         });
     }
     logout_on_remote(){//远程登出
-        if(this.platform === "ACAPP") return false;
+        if(this.platform === "ACAPP"){
+            this.root.AcWingOS.api.window.close();
+        }
+        else{
         $.ajax({
             url:"https://www.crisp.plus/settings/logout/",
             type: "GET",
@@ -244,6 +247,7 @@ class Settings{
                 }
             }
         });
+    }
     }
 
     acapp_login(appid, redirect_uri, scope, state){

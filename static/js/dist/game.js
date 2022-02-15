@@ -228,7 +228,7 @@ class Particle extends AcGameObject{
     start(){
         if(this.character === "me"){
             this.add_listening_events();
-        }else{
+        }else if(this.character === "robor"){
             let tx = Math.random() * this.playground.width/this.playground.scale;
             let ty = Math.random() * this.playground.height/this.playground.scale;
             this.move_to(tx, ty);
@@ -243,7 +243,12 @@ class Particle extends AcGameObject{
             //rect 是画布相对屏幕的量，left是（0,0）到左边界的距离，top是到上边界的距离
             const rect = outer.ctx.canvas.getBoundingClientRect();
             if(e.which === 3){
-                outer.move_to((e.clientX - rect.left)/outer.playground.scale, (e.clientY - rect.top)/outer.playground.scale);
+                let tx = (e.clientX - rect.left)/outer.playground.scale ;
+                let ty = (e.clientY - rect.top)/outer.playground.scale;
+                outer.move_to(tx, ty);
+                if(outer.playground.mode === "multi mode"){
+                    outer.playground.mps.send_move_to(tx, ty);
+                }
                 let flag = true;
                 //document.getElementById('button1').click();
                 flag=false;
@@ -486,6 +491,9 @@ class FireBall extends AcGameObject{
             if(event === "create_player"){
                 outer.receive_create_player(data.uuid, data.username, data.photo);
             }
+            else if(event === 'move_to'){
+                outer.receive_move_to(data.uuid, data.tx, data.ty);
+            }
         };
     }
 
@@ -512,6 +520,33 @@ class FireBall extends AcGameObject{
         );
         player.uuid = uuid;
         this.playground.players.push(player);
+    }
+
+    get_player(uuid){
+        let players = this.playground.players;
+        for (let i = 0; i < players.length; i ++){
+            let player = players[i];
+            if(player.uuid === uuid){
+                return player;
+            }
+        }
+        return null;
+    }
+
+    send_move_to(tx, ty){
+        let outer = this;
+        this.ws.send(JSON.stringify({
+            'event': "move_to",
+            'uuid': outer.uuid,
+            'tx': tx,
+            'ty': ty
+        }));
+    }
+    receive_move_to(uuid, tx, ty){
+        let player = this.get_player(uuid);
+        if(player){
+            player.move_to(tx, ty);
+        }
     }
 }class AcGamePlayground{
     constructor(root) {
@@ -554,7 +589,7 @@ class FireBall extends AcGameObject{
         this.game_map = new GameMap(this);
         this.resize();
         this.players = [];
-        
+        this.mode = mode; 
         this.players.push(new Player(this, this.width/2/this.scale, 0.5, 0.05, "black", 0.15, "me", this.root.settings.username, this.root.settings.photo));
 
         if(mode === "single mode"){//单人模式加机器人
@@ -811,7 +846,10 @@ class Settings{
         });
     }
     logout_on_remote(){//远程登出
-        if(this.platform === "ACAPP") return false;
+        if(this.platform === "ACAPP"){
+            this.root.AcWingOS.api.window.close();
+        }
+        else{
         $.ajax({
             url:"https://www.crisp.plus/settings/logout/",
             type: "GET",
@@ -821,6 +859,7 @@ class Settings{
                 }
             }
         });
+    }
     }
 
     acapp_login(appid, redirect_uri, scope, state){
