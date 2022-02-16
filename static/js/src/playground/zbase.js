@@ -33,10 +33,15 @@ class AcGamePlayground{
     show(mode){
         let outer = this;
         this.$playground.show();
-        
+
         this.width = this.$playground.width();
         this.height = this.$playground.height();
         this.game_map = new GameMap(this);
+        this.state = "waiting"; //等待开始,人齐后变为fighting,死后更新为over
+        this.notice_board = new NoticeBoard(this);
+        this.player_count = 0;
+        
+
         this.resize();
         this.players = [];
         this.mode = mode; 
