@@ -9,6 +9,7 @@ class ChatField {
         this.$input.hide();
 
         this.func_id = null;
+        this.chat_cd = this.playground.players[0].chat_cd;
 
         this.playground.$playground.append(this.$history);
         this.playground.$playground.append(this.$input);
@@ -26,6 +27,10 @@ class ChatField {
                 return false;
             }
             else if(e.which === 13){
+                if(outer.chat_cd > outer.playground.players[0].eps){
+                    return true;
+                }
+                outer.chat_cd = 1;
                 let username = outer.playground.root.settings.username;
                 let text = outer.$input.val();
                 if(text){

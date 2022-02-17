@@ -127,6 +127,7 @@ class ChatField {
         this.$input.hide();
 
         this.func_id = null;
+        this.chat_cd = this.playground.players[0].chat_cd;
 
         this.playground.$playground.append(this.$history);
         this.playground.$playground.append(this.$input);
@@ -144,6 +145,10 @@ class ChatField {
                 return false;
             }
             else if(e.which === 13){
+                if(outer.chat_cd > outer.playground.players[0].eps){
+                    return true;
+                }
+                outer.chat_cd = 1;
                 let username = outer.playground.root.settings.username;
                 let text = outer.$input.val();
                 if(text){
@@ -329,6 +334,10 @@ class Particle extends AcGameObject{
             this.flash_cd = 10;
             this.flash_img = new Image();
             this.flash_img.src = "https://img2.baidu.com/it/u=540894917,2727131209&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500";
+
+            this.chat_cd = 1;
+            this.chat_img = new Image();
+            this.chat_img.src = "https://img2.baidu.com/it/u=500696291,3693960548&fm=253&fmt=auto&app=138&f=JPEG?w=260&h=260";
 
         }
     }
@@ -518,6 +527,11 @@ class Particle extends AcGameObject{
 
     update(){
         this.spend_time += this.timedelta / 1000;
+        if(this.character === "me" && this.playground.mode === "multi mode"){
+        this.chat_cd -= this.timedelta / 1000;
+        this.chat_cd = Math.max(this.chat_cd, 0);
+        this.playground.chat_field.chat_cd = this.chat_cd;
+        }     
         if(this.character === "me" && this.playground.state === "fighting"){
             this.update_cd();
         }
@@ -592,9 +606,35 @@ class Particle extends AcGameObject{
             this.ctx.fillStyle = this.color;
             this.ctx.fill();
         }
+        if(this.character === "me" && this.playground.mode === "multi mode"){
+            this.render_chat_cd();
+        }
         if(this.character === "me" && this.playground.state === "fighting"){
             this.render_fireball_cd();
             this.render_flash_cd();
+        }
+    }
+
+    render_chat_cd(){
+        let scale = this.playground.scale;
+        let x = 1.7, y = 0.9 , r = 0.04;
+        this.ctx.save();
+        this.ctx.beginPath();
+        this.ctx.arc(x * scale, y * scale, r * scale, 0, Math.PI * 2, false);
+        this.ctx.stroke();
+        this.ctx.clip();
+        this.ctx.drawImage(this.chat_img, (x - r)*scale, (y - r)*scale, r * 2*scale, r * 2 * scale);
+        this.ctx.restore();
+        
+        //cd
+        if(this.chat_cd > this.eps){
+        this.ctx.beginPath();
+        //画两条半径
+        this.ctx.moveTo(x * scale, y * scale);
+        this.ctx.arc(x * scale, y * scale, r * scale, 0 - Math.PI / 2, Math.PI * 2 * this.flash_cd / 10 - Math.PI / 2, false);
+        this.ctx.lineTo(x * scale, y * scale);
+        this.ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
+        this.ctx.fill();
         }
     }
 
@@ -622,7 +662,7 @@ class Particle extends AcGameObject{
     }
     render_flash_cd(){
         let scale = this.playground.scale;
-        let x = 1.62, y = 0.9 , r = 0.04;
+        let x = 1.6, y = 0.9 , r = 0.04;
         this.ctx.save();
         this.ctx.beginPath();
         this.ctx.arc(x * scale, y * scale, r * scale, 0, Math.PI * 2, false);
@@ -898,6 +938,7 @@ class FireBall extends AcGameObject{
     }
 
     send_chat(username, message){
+        this.playground.players[0].chat_cd = 1;
         this.ws.send(JSON.stringify({
            'event': "chat",
            'username': username,

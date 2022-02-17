@@ -147,6 +147,7 @@ class MultiPlayerSocket{
     }
 
     send_chat(username, message){
+        this.playground.players[0].chat_cd = 1;
         this.ws.send(JSON.stringify({
            'event': "chat",
            'username': username,
