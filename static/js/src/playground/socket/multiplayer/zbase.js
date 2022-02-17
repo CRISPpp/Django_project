@@ -32,6 +32,9 @@ class MultiPlayerSocket{
             else if(event === "flash"){
                 outer.receive_flash(data.uuid, data.tx, data.ty);
             }
+            else if(event === "chat"){
+                outer.receive_chat(data.username, data.message);
+            }
         };
     }
 
@@ -141,5 +144,17 @@ class MultiPlayerSocket{
     receive_flash(uuid, tx, ty){
         let player = this.get_player(uuid);
         player.flash(tx, ty);
+    }
+
+    send_chat(username, message){
+        this.ws.send(JSON.stringify({
+           'event': "chat",
+           'username': username,
+           'message': message, 
+        }));
+    }
+    receive_chat(username, message){
+        
+        this.playground.chat_field.add_message(username, message);
     }
 }

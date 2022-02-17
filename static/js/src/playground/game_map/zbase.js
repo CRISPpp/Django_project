@@ -4,7 +4,7 @@ class GameMap extends AcGameObject{
         this.$music=$(`<audio src="https://www.crisp.plus/static/audio/bgm3.mp3" loop="loop" autoplay="autoplay">`);
         $("head").append(this.$music);
         this.playground = playground;
-        this.$canvas = $(`<canvas></canvas>`);//js提供的画布渲染工具
+        this.$canvas = $(`<canvas tabindex=0></canvas>`);//js提供的画布渲染工具,tabindex=0是监听属性
         this.ctx = this.$canvas[0].getContext('2d');
         this.ctx.canvas.width = this.playground.width;
         this.ctx.canvas.height = this.playground.height;
@@ -16,7 +16,7 @@ class GameMap extends AcGameObject{
     }
 
     start(){
-
+        this.$canvas.focus();//这个函数用来聚焦
     }
 
     resize(){
