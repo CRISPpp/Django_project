@@ -15,6 +15,10 @@ from queue import Queue #一个安全队列
 from time import sleep
 from threading import Thread
 
+from acapp.asgi import channel_layer
+from asgiref.sync import async_to_sync#将串行变成并行
+from django.core.cache import cache
+
 queue = Queue() #消息队列
 
 class Player:
@@ -42,12 +46,38 @@ class Pool:
         print("add player: %s %d" % (player.username, player.score))
         self.players.append(player)
     def check_match(self, a, b):
+        #if a.username == b.username:
+        #    return false
         dt = abs(a.score - b.score)
         a_limit = a.waiting_time * 50
         b_limit = b.waiting_time * 50
         return dt <= a_limit and dt <= b_limit
     def match_success(self, pl):
-        print("match success: %s %s" % (ps[0], ps[1]))
+        print("match success: %s %s" % (pl[0].username, pl[1].username))
+        players = []
+        room_name = "room-%s-%s" % (pl[0].uuid, pl[1].uuid)
+        for p in pl:
+            async_to_sync(channel_layer.group_add)(room_name, p.channel_name)
+            players.append({
+                'uuid': p.uuid,
+                'username': p.username,
+                'photo': p.photo,
+                'hp': 100,
+            })
+        
+        cache.set(room_name, players, 3600)
+
+        for p in pl:
+            async_to_sync(channel_layer.group_send)(
+                room_name,
+                {
+                    'type': "group_send_event",
+                    'event': "create_player",
+                    'uuid': p.uuid,
+                    'username': p.username,
+                    'photo': p.photo,
+                }
+            )
 
     def increase_waiting_time(self):
         for player in self.players:
@@ -55,9 +85,9 @@ class Pool:
 
     def match(self):
         while len(self.players) >= 2:
-            self.players = sorted(self.players, keys=lambda p: p.score)
+            self.players = sorted(self.players, key=lambda p: p.score)
             flag = False
-            for i in range(len(self.players - 1)):
+            for i in range(len(self.players) - 1):
                 a = self.players[i]
                 b = self.players[i + 1]
                 if self.check_match(a, b):

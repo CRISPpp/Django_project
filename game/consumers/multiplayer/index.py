@@ -10,6 +10,10 @@ from thrift.transport import TTransport
 from thrift.protocol import TBinaryProtocol
 from thrift import Thrift
 
+from game.models.player.player import Player
+from channels.db import database_sync_to_async#串行变并行
+
+
 class MultiPlayer(AsyncWebsocketConsumer):
     async def connect(self):
         await self.accept()
@@ -33,9 +37,13 @@ class MultiPlayer(AsyncWebsocketConsumer):
         # Create a client to use the protocol encoder
         client = Match.Client(protocol)
 
+        def db_get_player():
+            return Player.objects.get(user__username=data['username'])
+        self.player = await database_sync_to_async(db_get_player)()#得加await
+
         # Connect!
         transport.open()
-        client.add_player(1500, data['uuid'], data['username'], data['photo'], self.channel_name)
+        client.add_player(self.player.score, data['uuid'], data['username'], data['photo'], self.channel_name)
 
         # Close!
         transport.close()
@@ -147,6 +155,10 @@ class MultiPlayer(AsyncWebsocketConsumer):
         )
 
     async def group_send_event(self, data):#与群发的type一致,将信息发送给前端
+        if not self.room_name:
+            keys = cache.keys('*%s*' % (self.uuid))
+            if keys:
+                self.room_name = keys[0]
         await self.send(text_data=json.dumps(data))
 
 
