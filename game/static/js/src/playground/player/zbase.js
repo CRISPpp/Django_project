@@ -228,6 +228,7 @@ class Player extends AcGameObject {
     }
 
     update(){
+        
         this.spend_time += this.timedelta / 1000;
         if(this.character === "me" && this.playground.mode === "multi mode"){
         this.chat_cd -= this.timedelta / 1000;
@@ -237,9 +238,18 @@ class Player extends AcGameObject {
         if(this.character === "me" && this.playground.state === "fighting"){
             this.update_cd();
         }
+        this.update_win();
         this.update_move();
         this.render();
     }
+
+    update_win(){
+        if(this.playground.state === "fighting" && this.character === "me" && this.playground.players.length === 1){
+            this.playground.state = "over";
+            this.playground.score_board.win();
+        }
+    }
+
     update_cd(){
         this.fireball_cd -= this.timedelta / 1000;
         this.fireball_cd = Math.max(this.fireball_cd, 0);
@@ -387,7 +397,10 @@ class Player extends AcGameObject {
 
     on_destroy(){
         if(this.character === "me"){
-            this.playground.state = "over";
+            if(this.playground.state === "fighting"){
+                this.playground.state = "over";
+                this.playground.score_board.lose();
+            }
         }
         this.playground.player_count--;
         for(let i = 0; i < this.playground.players.length; i++){

@@ -15,7 +15,9 @@ class AcGameObject{
         }
         return res;
     }
+    late_update(){ //每一帧的最后执行一次，保证结束图层渲染在其他的上面
 
+    }
     start(){// 第一帧
         
     }
@@ -54,6 +56,12 @@ let AC_GAME_ANIMATION = function(timestamp){
             obj.update();
         }
     }
+
+    for(let i = 0; i < AC_GAME_OBJECTS.length; i ++){
+        let obj = AC_GAME_OBJECTS[i];
+        obj.late_update();
+    }
+
     last_timestamp = timestamp;
     requestAnimationFrame(AC_GAME_ANIMATION);//递归执行
 }
