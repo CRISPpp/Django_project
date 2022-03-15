@@ -3,7 +3,9 @@
 <head>
     <link rel="icon" href="/static/image/favicon.ico" mce_href="/static/image/favicon.ico" type="image/x-icon">
     <link rel="shortcut icon" href="/static/image/favicon.ico" mce_href="/static/image/favicon.ico" type="image/x-icon">
-
+    <title>玩球</title>
+    <meta name="description" content="this is a very great game hhh">
+    <meta name="keywords" content="crisp, 球, 玩球, 击剑">
     <link rel="stylesheet" href="https://cdn.acwing.com/static/jquery-ui-dist/jquery-ui.min.css">
     <script src="https://cdn.acwing.com/static/jquery/js/jquery-3.3.1.min.js"></script>
     <link rel="stylesheet" href="{% static 'css/game.css' %}">
@@ -12,7 +14,7 @@
 
 <body style="margin: 0">
     <div id="crisp_1"></div>
-    
+
     <!--audio id="bgMusic" loop >
         <source src={% static 'audio/homemusic.mp3' %} type="audio/mpeg">
     </audio>
@@ -30,12 +32,21 @@
         }
         
     </script -->
-    
+
     <script type="module">
-        import {AcGame} from "{% static 'js/dist/game.js' %}";
-        $(document).ready(function(){
+        import { AcGame } from "{% static 'js/dist/game.js' %}";
+        $(document).ready(function () {
             let ac_game = new AcGame("crisp_1");
         });
         console.log("test sentense")
     </script>
 </body>
+<!--
+<p style="background:none;height: 5%;position: fixed;bottom: 0px;width: 100%;text-align: center;">
+    <img style="padding-top:2px;" src="../../static/image/你的图片">
+    <a class="banquan" style="color:#000;" href="https://beian.miit.gov.cn" target="_blank">粤ICP备2022000824号</a>
+</p>
+-->
+<footer style="background:none; height:5%; position: fixed; bottom: 0px; width: 100%; text-align: center;">
+    <a href="https://beian.miit.gov.cn/#/Integrated/index" style="color: white;" target="_blank">粤ICP备2022000824号</a>
+</footer>
